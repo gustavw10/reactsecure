@@ -27,13 +27,21 @@ function LogIn({ login }) {
 }
 function LoggedIn() {
   const [dataFromServer, setDataFromServer] = useState("Loading...")
-  
-  useEffect(() => { facade.fetchData().then(data=> setDataFromServer(data.msg))}, [])
+  const [errorMessage, setErrorMessage] = useState("")
+
+  useEffect(() => { facade.fetchData().then(data=> setDataFromServer(data.msg))
+    .catch((error) => {
+      error.fullError.then((err) => {
+        setErrorMessage(err.message)
+        console.log("error:" + err)
+      })
+    })}, [])
  
   return (
     <div>
       <h2>Data Received from server</h2>
       <h3>{dataFromServer}</h3>
+      {errorMessage}
     </div>
   )
  
@@ -41,6 +49,7 @@ function LoggedIn() {
  
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
  
   const logout = () => {  
     facade.logout()
@@ -48,11 +57,22 @@ function App() {
  } 
   const login = (user, pass) => { 
     facade.login(user,pass)
-    .then(res =>setLoggedIn(true));} 
+    .then(res => {
+      setLoggedIn(true)
+      setErrorMessage("")  
+    }).catch((error) => {
+      error.fullError.then((err ) => {
+        setErrorMessage(err.message)
+        console.log("error: " + err)
+      })
+    })
+    ;} 
  
   return (
     <div>
-      {!loggedIn ? (<LogIn login={login} />) :
+      {!loggedIn ? 
+      (<div><LogIn login={login} /> 
+      {errorMessage}</div>) :
         (<div>
           <LoggedIn />
           <button onClick={logout}>Logout</button>
