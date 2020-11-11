@@ -1,5 +1,8 @@
 import React, { useState,useEffect } from "react"
 import facade from "./apiFacade";
+//import 'bootstrap/dist/css/bootstrap.min.css';
+import './final.css'
+
  
 function LogIn({ login }) {
   const init = { username: "", password: "" };
@@ -15,13 +18,23 @@ function LogIn({ login }) {
  
   return (
     <div>
+      <div id="formContent">
       <h2>Login</h2>
-      <form onChange={onChange} >
-        <input placeholder="User Name" id="username" />
-        <input placeholder="Password" id="password" />
-        <button onClick={performLogin}>Login</button>
+      
+      <form class="fadeIn second" onChange={onChange} >
+        <input placeholder="User Name" class="form-control" id="username" />
+        <br></br>
+        <div class="fadeIn third"><input placeholder="Password" class="form-control" id="password" /></div>
+        <br></br>
+        
+        <br></br>
+
+        <div id="formFooter">
+        <a class="underlineHover" href="#"><div class="fadeIn fourth"><button class="btn btn-default" onClick={performLogin}>Login</button></div></a>
+        </div>
       </form>
-    </div>
+
+    </div></div>
   )
  
 }
@@ -69,13 +82,13 @@ function App() {
     ;} 
  
   return (
-    <div>
+    <div class="wrapper fadeInDown">
       {!loggedIn ? 
       (<div><LogIn login={login} /> 
       {errorMessage}</div>) :
         (<div>
           <LoggedIn />
-          <button onClick={logout}>Logout</button>
+          <button class="btn btn-default"onClick={logout}>Logout</button>
         </div>)}
     </div>
   )
