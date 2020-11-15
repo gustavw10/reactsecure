@@ -1,8 +1,16 @@
 import React, { useState,useEffect } from "react"
 import facade from "./apiFacade";
 //import 'bootstrap/dist/css/bootstrap.min.css';
-import './final.css'
-
+import './other.css'
+import {
+  BrowserRouter as Router,
+  NavLink,
+  Switch,
+  Route,
+  Link,
+  useParams,
+  useRouteMatch
+} from "react-router-dom";
  
 function LogIn({ login }) {
   const init = { username: "", password: "" };
@@ -50,15 +58,164 @@ function LoggedIn() {
       })
     })}, [])
  
-  return (
-    <div>
-      <h2>Data Received from server</h2>
-      <h3>{dataFromServer}</h3>
-      {errorMessage}
+    return (
+      <div>
+      <Header />
+      <Switch>
+        <Route exact path="/">
+          <Home data = {dataFromServer} />
+        </Route>
+        <Route path="/externalfrontend" >
+          <ExternalFrontend />
+        </Route>
+        <Route path="/externalbackend" >
+          <ExternalBackend />
+        </Route>
+        <Route path="/scraper" >
+          <Webscraper />
+        </Route>
+      </Switch>
     </div>
-  )
+    );
  
 }
+
+const Header = () => {
+  return (
+<div><ul className="header">
+  <li><NavLink exact activeClassName="active" to="/">Home</NavLink></li>
+  <li><NavLink activeClassName="active" to="/externalfrontend">External frontend</NavLink></li>
+  <li><NavLink activeClassName="active" to="/externalbackend">External backend</NavLink></li>
+  <li><NavLink activeClassName="active" to="/scraper">Webscraper</NavLink></li>
+</ul>
+<hr />
+</div>
+  );
+}
+
+function Home(props) {
+  return (
+    <div>
+      Data received from server: 
+      <br></br>{props.data}
+    </div>
+  );
+}
+
+function ExternalFrontend() {
+  const [joke, setJoke] = useState("");
+
+  useEffect(() => {
+    fetch('https://api.chucknorris.io/jokes/random').then(res=>res.json()).then(data=>{
+      setJoke(data.value)
+      localStorage.setItem("currentJoke", data.value); 
+    })
+  }, []);
+
+  return (
+    <div>
+      Her er en joke:
+      <br></br>
+      {joke}
+      <br></br>
+      <br></br>
+      <button
+        class="btn btn-default"
+        onClick={() =>
+          fetch("https://api.chucknorris.io/jokes/random")
+            .then((res) => res.json())
+            .then((data) => {
+              setJoke(data.value);
+            })
+        }
+      >
+        Click for new joke
+      </button>
+      <br></br>
+      <button class="btn btn-default" onClick={() => SaveJoke()}>
+        Click to add joke this joke to database
+      </button>
+      <br></br>
+    </div>
+  );
+}
+
+function ExternalBackend(){
+  const [joke, setJoke] = useState("");
+
+  useEffect(() => {
+    fetch('https://conphas.com/ca3/api/info/joke').then(res=>res.json()).then(data=>{
+      setJoke(data)
+      localStorage.setItem("currentJoke", data.value); 
+    })
+  }, []);
+
+  return (
+    <div>
+      Her er en joke:
+      <br></br> 
+      Value: {joke.value}
+      <br></br> 
+      Url: {joke.url}
+      <br></br>
+      <br></br>
+      <button class="btn btn-default" onClick={() => SaveJoke()}>Click to add joke this joke to database</button>
+    </div>
+  );
+}
+
+function SaveJoke(props){
+  const va = localStorage.getItem("currentJoke")
+  fetch('https://conphas.com/ca3/api/info/', {
+  method: 'POST',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    joke: va
+  })
+})
+}
+
+function Webscraper(){
+  const [webData, setData] = useState("");
+  const url = "https://conphas.com/ca3/api/info/parallel";
+  useEffect(() => {
+    fetch(url).then(res=>res.json()).then(data=>{
+      setData(data)
+    })
+
+    const interval = setInterval(() => {
+      fetch(url).then(res=>res.json()).then(data=>{
+      setData(data)
+    })
+    }, 20000)
+
+    return () => clearInterval(interval)
+  }, []);
+  
+  if(!webData){
+    return (
+    <div>
+      Waiting for data...
+    </div>
+  );
+  }
+  
+  return (
+    <div>
+      {webData.title}, time spent: {webData.timeSpent}
+
+      {webData.tags.map((data) => (
+         <tr>
+           <td>{data.url}</td> <td> -- div count: {data.divCount}</td>
+         </tr>
+       ))}
+    </div>
+  );
+}
+
  
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
@@ -73,23 +230,26 @@ function App() {
     .then(res => {
       setLoggedIn(true)
       setErrorMessage("")  
-    }).catch((error) => {
-      error.fullError.then((err ) => {
-        setErrorMessage(err.message)
-        console.log("error: " + err)
-      })
     })
     ;} 
  
   return (
     <div class="wrapper fadeInDown">
       {!loggedIn ? 
-      (<div><LogIn login={login} /> 
+      (<div><LogIn login={login} />  
       {errorMessage}</div>) :
-        (<div>
+        (<div> 
+        
+        <br>
+        </br>
+        <br></br>
+          <Router>
           <LoggedIn />
-          <button class="btn btn-default"onClick={logout}>Logout</button>
+          </Router>
+           <br></br><br></br><br></br><br></br><br></br><br></br><br></br><button class="btn btn-default" onClick={logout}>Logout</button>
         </div>)}
+        
+        
     </div>
   )
  
