@@ -144,7 +144,7 @@ function ExternalBackend(){
   const [joke, setJoke] = useState("");
 
   useEffect(() => {
-    fetch('https://conphas.com/ca3/api/info/joke').then(res=>res.json()).then(data=>{
+    fetch('https://conphas.com/startkodeca3/api/info/joke').then(res=>res.json()).then(data=>{
       setJoke(data)
       localStorage.setItem("currentJoke", data.value); 
     })
@@ -166,7 +166,7 @@ function ExternalBackend(){
 
 function SaveJoke(props){
   const va = localStorage.getItem("currentJoke")
-  fetch('https://conphas.com/ca3/api/info/', {
+  fetch('https://conphas.com/startkodeca3/api/info/', {
   method: 'POST',
   headers: {
     'Accept': 'application/json',
@@ -180,7 +180,7 @@ function SaveJoke(props){
 
 function Webscraper(){
   const [webData, setData] = useState("");
-  const url = "https://conphas.com/ca3/api/info/parallel";
+  const url = "https://conphas.com/startkodeca3/api/info/parallel";
   useEffect(() => {
     fetch(url).then(res=>res.json()).then(data=>{
       setData(data)

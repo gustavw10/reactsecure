@@ -1,4 +1,4 @@
-const URL = "http://localhost:8080/startkodeca3";
+const URL = "https://conphas.com/startkodeca3/startkodeca3";
  
 function handleHttpErrors(res) {
  if (!res.ok) {
